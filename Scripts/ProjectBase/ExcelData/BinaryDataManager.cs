@@ -27,6 +27,7 @@ public class BinaryDataManager : SingleBaseManger<BinaryDataManager>
     {
         LoadTable<T_playerInfoContainer, T_playerInfo>();
         LoadTable<T_BoarInfoContainer, T_BoarInfo>();
+        LoadTable<T_PlayerATKInfoContainer,T_PlayerATKInfo>();
     }
 
     /// <summary>
@@ -95,7 +96,7 @@ public class BinaryDataManager : SingleBaseManger<BinaryDataManager>
                         int lenght = BitConverter.ToInt32(bytes, index);
                         index += 4;
                         //¶ÁÈ¡×Ö·û´®
-                        info.SetValue(dataObject, BitConverter.ToString(bytes, lenght));
+                        info.SetValue(dataObject,Encoding.UTF8.GetString(bytes,index,lenght)); 
                         index += lenght;
                     }
                 }

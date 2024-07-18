@@ -66,6 +66,8 @@ public class PlayerController : EntityObj
     [SerializeField] private int jumpLimit;
 
     [Header("玩家观测数据")]
+    public Rect ATKRect;
+    public bool isDead;
     /// <summary>
     /// 攻击次数 用于连招计数
     /// </summary>
@@ -138,8 +140,15 @@ public class PlayerController : EntityObj
         //移除监听输入相关
         RemoveListenInput();
     }
-
-    //用于绘制实体的判定
+    //存储角色攻击信息
+    private T_PlayerATKInfo playerATkInfo;
+    /* public Vector2 lb;
+    public Vector2 rb;
+    public Vector2 lt;
+    public Vector2 rt; */
+    /// <summary>
+    /// 用于绘制实体的判定
+    /// </summary>
     public virtual void OnDrawGizmos()
     {
         Gizmos.color = Color.green;
@@ -155,8 +164,19 @@ public class PlayerController : EntityObj
         Gizmos.DrawWireSphere(this.transform.position + Vector3.right * roleWidth / 2 + Vector3.up * roleHight / 2, 0.1f);
         //绘制左判定点
         Gizmos.DrawWireSphere(this.transform.position - Vector3.right * roleWidth / 2 + Vector3.up * roleHight / 2, 0.1f);
+        /* rb = new Vector2(roleCollisionBox.x + roleWidth/2, roleCollisionBox.y);
+        lb = new Vector2(roleCollisionBox.x - roleWidth / 2, roleCollisionBox.y);
+        Gizmos.DrawLine(rb,lb);
+        lt = new Vector2(roleCollisionBox.x - roleWidth / 2, roleCollisionBox.y + roleHight);
+        rt = new Vector2(roleCollisionBox.x + roleWidth / 2, roleCollisionBox.y + roleHight);
+        Gizmos.DrawLine(lt,rt); */
+
+
+
     }
-    //用于综合Input相关监听函数
+    /// <summary>
+    /// 用于综合Input相关监听函数
+    /// </summary>
     public virtual void ListenInput()
     {
         //启用Input输入
@@ -171,7 +191,9 @@ public class PlayerController : EntityObj
         //监听攻击键的输入
         EventCenter.Instance.AddEventListener("攻击键触发",NormalAtk);
     }
-    //用于删除Input相关监听函数
+    /// <summary>
+    /// 用于删除Input相关监听函数
+    /// </summary>
     public virtual void RemoveListenInput()
     {
         //关闭Input输入
@@ -188,13 +210,16 @@ public class PlayerController : EntityObj
     }
     public override void InitInfo()
     {
-        base.InitInfo();
         //测试代码
         T_playerInfo info = BinaryDataManager.Instance.GetTable<T_playerInfoContainer>().dataDic[0];
         hp = info.f_hp;
         atk = info.f_atk;
         invinvibleTime = info.f_invinvibleTime;
         jumpLimit = info.f_jumpLimit;
+        roleHight =  info.f_roleHight;
+        roleWidth = info.f_roleWidth;
+        base.InitInfo();
+        
     }
     /// <summary>
     /// 用于攻击的函数
@@ -235,7 +260,7 @@ public class PlayerController : EntityObj
     private void Move(Vector2 direct)
     {
         //如果不能移动就直接返回
-        if (!CanMoving)
+        if (!CanMoving&&isDead)
             return;
         //得到输入的方向
         nowDirect.x = direct.x;
@@ -266,7 +291,7 @@ public class PlayerController : EntityObj
     {
         isjumpTrigger = canJump;
         //跳跃按键按下 跳跃次数少于跳跃限制 并且满足跳跃条件
-        if (isjumpTrigger && jumpIndex< jumpLimit && CanJump)
+        if (isjumpTrigger && jumpIndex< jumpLimit && CanJump&&!isDead)
         {
             //赋予初始速度
             nowYSpeed = initYSpeed;
@@ -439,8 +464,38 @@ public class PlayerController : EntityObj
     public override void Dead()
     {
         base.Dead();
+        //设置死亡状态
+        isDead = true;
         //切换死亡动画
         ChangeAnimation(E_Animation_Player_Type.Death);
         //后续逻辑
     }
+    /// <summary>
+    /// 造成伤害的动画触发实践 的方法
+    /// </summary>
+    public void Dmg(int id)
+    {
+        ReallyDmg(id);
+    }
+    public void ReallyDmg(int id)
+    {
+        ATKRect =  new Rect();
+        playerATkInfo  = BinaryDataManager.Instance.GetTable<T_PlayerATKInfoContainer>().dataDic[id];
+        //设置 攻击的矩形的位置
+        string[] str =  playerATkInfo.f_rect.Split(',');
+        ATKRect.x = this.transform.position.x  + float.Parse(str[0]);
+        ATKRect.y = this.transform.position.y + float.Parse(str[1]);
+        /* ATKRect.width = float.Parse(str[2]);
+        ATKRect.height = float.Parse(str[3]); */
+        ATKRect.width = 10;
+        ATKRect.height = 10;
+        foreach(MonsterObj m in MonsterMrg.Instance.monsterObjs.Values)
+        {
+            if(RectCast(ATKRect,m.roleCollisionBox))
+            {
+                print("攻击到了对象");
+            }
+        }
+
+    }    
 }

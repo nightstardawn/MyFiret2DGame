@@ -47,10 +47,12 @@ public class MonsterObj : EntityObj
             //两个矩形相交的条件：两个矩形的重心距离在x轴y轴上都小于两个矩形长或宽的一半之和。
             //重心距离在x轴上的投影长度<两个矩形的在x轴的长度之和/2
             //重心距离在y轴上的投影长度 < 两个矩形在y轴上的宽度之和 / 2
-            if (Mathf.Abs(roleTopDeterminePoint.x-player.roleTopDeterminePoint.x)<(roleWidth+player.roleWidth)/2&&
+            /* if (Mathf.Abs(roleTopDeterminePoint.x-player.roleTopDeterminePoint.x)  < (roleWidth+player.roleWidth)/2 &&
                Mathf.Abs(roleLeftDeterminePoint.y - player.roleLeftDeterminePoint.y) < (roleHight + player.roleHight) / 2)
                 return true;
-            return false;
+            return false; */
+            
+            return RectCast(this.roleCollisionBox, player.roleCollisionBox);
         }
     }
     protected override void Start()
@@ -61,12 +63,18 @@ public class MonsterObj : EntityObj
         //初始化玩家对象
         player = GameObject.Find("Player").GetComponent<PlayerController>();
     }
+
+    protected  override void OnDestroy()
+    {
+
+    }
     /// <summary>
     /// 初始化数据
     /// </summary>
     public override void InitInfo()
     {
         base.InitInfo();
+
     }
     protected override void Update()
     {

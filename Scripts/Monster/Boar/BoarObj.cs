@@ -37,13 +37,19 @@ public class BoarObj : MonsterObj
     protected override void Start()
     {
         base.Start();
+        //添加怪物到怪物 列表中
+        MonsterMrg.Instance.AddIntoLevelMonsterList(this);
+    }
+    protected override void OnDestroy() 
+    {
+        //怪物被摧毁时 从移除怪物列表
+        MonsterMrg.Instance.RemoveFromLevelMonsterList(this);
     }
     /// <summary>
     /// 初始化数据
     /// </summary>
     public override void InitInfo()
     {
-        base.InitInfo();
         T_BoarInfo info = BinaryDataManager.Instance.GetTable<T_BoarInfoContainer>().dataDic[(int)e_boarDataIndex];
         roleWidth = info.f_roleWidth;
         roleHight = info.f_roleHight;
@@ -55,6 +61,8 @@ public class BoarObj : MonsterObj
         YRepelledSpeed = info.f_YRepelledSpeed;
         xAcceleration = info.f_xAcceleration;
         waitTime = info.f_PatrolWait;
+        base.InitInfo();
+        
     }
     protected override void Update()
     {

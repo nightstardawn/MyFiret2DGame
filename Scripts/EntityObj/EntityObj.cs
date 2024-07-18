@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using static UnityEditor.PlayerSettings;
-public class EntityObj : MonoBehaviour
+public class EntityObj : MonoBehaviour , IRectCast
 {
     [Header("基础信息")]
     /// <summary>
@@ -13,6 +13,10 @@ public class EntityObj : MonoBehaviour
     /// 实体的宽
     /// </summary>
     public float roleWidth;
+    /// <summary>
+    /// 角色的碰撞箱范围
+    /// </summary>
+     public Rect roleCollisionBox; 
     /// <summary>
     /// 角色移动速度
     /// </summary>
@@ -162,8 +166,15 @@ public class EntityObj : MonoBehaviour
         //移除平台监听
         PlatformLogic.Instance.RemoveUpdateCheck(this);
     }
+    protected virtual void OnDestroy()
+    {
+
+    }
     protected virtual void Update()
     {
+        //更新 实体的 碰撞箱子
+        //更新角色碰撞箱
+        UpdataCollisionBox();
         //每帧更新一些基础信息
         UpdataInfo();
         //更新 下落逻辑
@@ -173,6 +184,16 @@ public class EntityObj : MonoBehaviour
         //更新 墙相关逻辑
         EventCenter.Instance.EventTrigger<EntityObj>($"{this.gameObject.name}的墙逻辑处理", this);
         
+
+    }
+    //更新实体的碰撞箱的位置 
+    protected void UpdataCollisionBox()
+    {
+        
+        roleCollisionBox.x = this.transform.position.x;
+        roleCollisionBox.y =  this.transform.position.y;
+        roleCollisionBox.width = this.roleWidth;
+        roleCollisionBox.height = this.roleHight;  
 
     }
     /// <summary>
@@ -256,6 +277,25 @@ public class EntityObj : MonoBehaviour
     /// </summary>
     public virtual void Dead()
     {
+
+    }
+    /// <summary>
+    /// 用于检测矩形的 碰撞
+    /// </summary>
+
+    public virtual bool RectCast(Rect self ,Rect taget)
+    {
+        //两个矩形相交的条件：两个矩形的重心距离在x轴y轴上都小于两个矩形长或宽的一半之和。
+            //重心距离在x轴上的投影长度<两个矩形的在x轴的长度之和/2
+            //重心距离在y轴上的投影长度 < 两个矩形在y轴上的宽度之和 / 2
+            /* if (Mathf.Abs(roleTopDeterminePoint.x-player.roleTopDeterminePoint.x)  < (roleWidth+player.roleWidth)/2 &&
+               Mathf.Abs(roleLeftDeterminePoint.y - player.roleLeftDeterminePoint.y) < (roleHight + player.roleHight) / 2)
+                return true;
+            return false; */
+        if(Mathf.Abs(self.x-taget.x) <  (self.width+taget.width)/2 &&
+            Mathf.Abs(self.y - taget.y) < (self.height + taget.height) / 2)
+            return true;
+        return false;
 
     }
 }
