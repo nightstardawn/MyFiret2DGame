@@ -93,18 +93,18 @@ public class PlayerController : EntityObj
     /// <summary>
     ///  用于检测移动输入是否停止 刚刚开始时设置为停止
     /// </summary>
-    [SerializeField] private bool isMoveStop=true;
+    [SerializeField] private bool isMoveStop = true;
     /// <summary>
     /// 角色能否移动
     /// </summary>
     [SerializeField]
-    private bool CanMoving 
+    private bool CanMoving
     {
         get
         {
             AnimatorStateInfo stateInfo1 = animator.GetCurrentAnimatorStateInfo(1);
-            if (stateInfo1.IsName("Atk1")||
-                stateInfo1.IsName("Atk2")||
+            if (stateInfo1.IsName("Atk1") ||
+                stateInfo1.IsName("Atk2") ||
                 isWound)
                 return false;
             return true;
@@ -114,18 +114,18 @@ public class PlayerController : EntityObj
     /// 角色是否能跳跃
     /// </summary>
     [SerializeField]
-    private bool CanJump 
+    private bool CanJump
     {
         get
         {
             AnimatorStateInfo stateInfo1 = animator.GetCurrentAnimatorStateInfo(1);
             if (stateInfo1.IsName("Atk1") ||
-                stateInfo1.IsName("Atk2")||
+                stateInfo1.IsName("Atk2") ||
                 stateInfo1.IsName("FallGround"))
                 return false;
             return true;
         }
-    }   
+    }
     protected override void Start()
     {
         base.Start();
@@ -163,13 +163,13 @@ public class PlayerController : EntityObj
         InputManager.Instance.OnEnableControl();
         //监听移动输入
         EventCenter.Instance.AddEventListener<Vector2>("WASD触发", Move);
-        EventCenter.Instance.AddEventListener<bool>("WASD松开",StopMove);
+        EventCenter.Instance.AddEventListener<bool>("WASD松开", StopMove);
         //监听跳跃输入
         EventCenter.Instance.AddEventListener<bool>("跳跃触发", Jump);
         //监听下平台输入
         EventCenter.Instance.AddEventListener<bool>("下平台触发", FallDownFromPlatform);
         //监听攻击键的输入
-        EventCenter.Instance.AddEventListener("攻击键触发",NormalAtk);
+        EventCenter.Instance.AddEventListener("攻击键触发", NormalAtk);
     }
     //用于删除Input相关监听函数
     public virtual void RemoveListenInput()
@@ -209,10 +209,10 @@ public class PlayerController : EntityObj
         //通过状态机 的名字 对攻击的序列赋值
         if (stateInfo1.IsName("Null"))
             atkIndex = 1;
-        else if(stateInfo1.IsName("Atk1"))
+        else if (stateInfo1.IsName("Atk1"))
             atkIndex = 2;
         else
-            atkIndex=0;
+            atkIndex = 0;
         //将动画状态设置为攻击
         ChangeAnimation(E_Animation_Player_Type.Atk);
         //设置延迟函数
@@ -224,7 +224,7 @@ public class PlayerController : EntityObj
     /// </summary>
     private void DelayAtkIndex()
     {
-        atkIndex=0;
+        atkIndex = 0;
         //将动画状态设置为攻击
         ChangeAnimation(E_Animation_Player_Type.Atk);
     }
@@ -240,8 +240,8 @@ public class PlayerController : EntityObj
         //得到输入的方向
         nowDirect.x = direct.x;
         //判断输入的方向 改变人物的朝向
-        if(nowDirect.x!=0)
-            spriteRenderer.flipX= nowDirect.x > 0 ? false : true;
+        if (nowDirect.x != 0)
+            spriteRenderer.flipX = nowDirect.x > 0 ? false : true;
         //判断 移动输入是否停止 
         if (isMoveStop)
             nowXSpeed = 0;
@@ -266,12 +266,12 @@ public class PlayerController : EntityObj
     {
         isjumpTrigger = canJump;
         //跳跃按键按下 跳跃次数少于跳跃限制 并且满足跳跃条件
-        if (isjumpTrigger && jumpIndex< jumpLimit && CanJump)
+        if (isjumpTrigger && jumpIndex < jumpLimit && CanJump)
         {
             //赋予初始速度
             nowYSpeed = initYSpeed;
             //复原跳跃触发器
-            isjumpTrigger=false;
+            isjumpTrigger = false;
             //增加已经跳跃次数
             jumpIndex++;
             //将空中状态改为true
@@ -288,7 +288,7 @@ public class PlayerController : EntityObj
     {
         isFallDownFromPlatForm = canFallDown;
         //判断当前平台 是否可以下落
-        if(isFallDownFromPlatForm && canFallFormNowPlatform)
+        if (isFallDownFromPlatForm && canFallFormNowPlatform)
         {
             Fall();
         }
@@ -422,7 +422,7 @@ public class PlayerController : EntityObj
             //执行死亡的方法
             Dead();
         }
-            
+
     }
     /// <summary>
     /// 处理无敌时间的协程函数
@@ -431,7 +431,7 @@ public class PlayerController : EntityObj
     public IEnumerator InvincibleTime()
     {
         yield return new WaitForSeconds(invinvibleTime);
-        isInvincible =false;
+        isInvincible = false;
     }
     /// <summary>
     /// 实体死亡的方法
